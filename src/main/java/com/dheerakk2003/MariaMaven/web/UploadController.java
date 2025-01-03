@@ -21,7 +21,7 @@ import java.util.Optional;
 @RestController
 public class UploadController {
 
-    private static final Path UploadDir = Paths.get("uploads/");
+    private static final Path UploadDir = Paths.get("uploads/uploaded/");
 
     private final UploadService us;
 
@@ -61,7 +61,7 @@ public class UploadController {
         Path uploadPath = UploadDir.resolve(fname);
         File file = new File(uploadPath.toString());
         if(file.exists() && !file.isDirectory()){
-            ResizeService.resizeVideo(uploadPath.toString(),"uploads/myMid"+fname,480, 360);
+            ResizeService.resizeVideo(uploadPath.toString(),"uploads/resized/myMid"+fname,480, 360);
             throw new ResponseStatusException(HttpStatus.OK);
         }
         else
