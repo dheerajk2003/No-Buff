@@ -14,7 +14,7 @@ import static org.bytedeco.opencv.global.opencv_imgproc.resize;
 
 @Service
 public class ResizeService {
-    public static void resizeVideo(String inputFileName, String outputFileName, int width, int height){
+    public static void resizeVideo(String inputFileName, String outputFileName, int width, int height, int bitrate){
         try{
             FFmpegFrameGrabber grabber = new FFmpegFrameGrabber(inputFileName);
             grabber.start();
@@ -23,7 +23,7 @@ public class ResizeService {
             recorder.setVideoCodec(avcodec.AV_CODEC_ID_H264);
             recorder.setFormat("mp4");
             recorder.setFrameRate(grabber.getFrameRate());
-            recorder.setVideoBitrate(500_000);
+            recorder.setVideoBitrate(bitrate);
             recorder.start();
 
             OpenCVFrameConverter.ToMat converter = new OpenCVFrameConverter.ToMat();

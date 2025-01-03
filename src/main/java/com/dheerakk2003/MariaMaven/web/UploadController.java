@@ -2,14 +2,15 @@ package com.dheerakk2003.MariaMaven.web;
 
 import com.dheerakk2003.MariaMaven.models.Upload;
 import com.dheerakk2003.MariaMaven.service.ResizeService;
+import com.dheerakk2003.MariaMaven.service.StreamService;
 import com.dheerakk2003.MariaMaven.service.UploadService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
+import reactor.core.publisher.Mono;
 
-import javax.swing.*;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -61,11 +62,28 @@ public class UploadController {
         Path uploadPath = UploadDir.resolve(fname);
         File file = new File(uploadPath.toString());
         if(file.exists() && !file.isDirectory()){
-            ResizeService.resizeVideo(uploadPath.toString(),"uploads/resized/myMid"+fname,480, 360);
+            ResizeService.resizeVideo(uploadPath.toString(),"uploads/resized/360p/"+fname,480, 360, 500_00);
+            ResizeService.resizeVideo(uploadPath.toString(),"uploads/resized/720p/"+fname,960, 720, 5000_00);
+            boolean deleted = file.delete();
             throw new ResponseStatusException(HttpStatus.OK);
         }
         else
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @GetMapping("/video/{filename}")
+    public Mono<ResponseEntity<byte[]>> ServeVideo(@RequestHeader(value = "Range", required = false) String rangeHeader, @RequestHeader(value = "Hd", required = false) Integer hd, @PathVariable String filename) throws IOException{
+        long start = 0;
+        long end = 0;
+        Integer Hd = (hd == null) ? 0 : 1;
+        if(rangeHeader != null && rangeHeader.startsWith("bytes=")){
+            String[] ranges = rangeHeader.substring(6).split("-");
+            start = Long.parseLong(ranges[0]);
+            if(ranges.length > 1 && !ranges[1].isEmpty()){
+                end = Long.parseLong(ranges[1]);
+            }
+        }
+        return StreamService.ServeVid(start, end, filename, Hd);
     }
 }
 
