@@ -15,9 +15,9 @@ import java.util.concurrent.CompletableFuture;
 @Service
 public class StreamService {
     private static final String DirPath = "uploads/resized/";
-    public static Mono<ResponseEntity<byte[]>> ServeVid(Long start, Long end, String filename, Integer hd) throws IOException {
-        String VidPath = (hd == 1) ? "720p/" : "360p/";
-        AsynchronousFileChannel fileChannel = AsynchronousFileChannel.open(Paths.get(DirPath+VidPath+filename));
+    public static Mono<ResponseEntity<byte[]>> ServeVid(Long start, Long end, String filename) throws IOException {
+
+        AsynchronousFileChannel fileChannel = AsynchronousFileChannel.open(Paths.get(DirPath+filename));
         long filelength = fileChannel.size();
         if(end == 0 || end >= filelength)
             end = filelength - 1;

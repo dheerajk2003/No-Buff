@@ -8,22 +8,26 @@
 <body>
 <h1>Video Streaming Example</h1>
 <video id="videoPlayer" width="640" height="360" controls>
-    <source src="http://localhost:8080/video/two.mp4" type="video/mp4">
-    Your browser does not support the video tag.
+
 </video>
-<!--<script>-->
-<!--    async function getVideo(){-->
-<!--        const res = await fetch("http://localhost:8080/video/one.mp4",{-->
-<!--            headers:{-->
-<!--                Range: "bytes=0-2000",-->
-<!--                Hd: 1-->
-<!--            }-->
-<!--        });-->
-<!--        console.log(res);-->
-<!--        const data = res.text();-->
-<!--        console.log(data);-->
-<!--    }-->
-<!--    getVideo();-->
-<!--</script>-->
+<input type="text" id="filename" placeholder="filename"/>
+<select id="qual">
+    <option value="720p/">720</option>
+    <option value="360p/">360</option>
+</select>
+<button onclick="getVideo()">See</button>
+<script>
+    function getVideo(){
+        const vTag = document.getElementById("videoPlayer");
+        const quality = document.getElementById("qual").value;
+        const filename = document.getElementById("filename").value;
+        if(!quality || !filename){
+            alert("fill all entries");
+            return;
+        }
+        vTag.src = "http://localhost:8080/"+quality+filename;
+        vTag.type = "video/mp4";
+    }
+</script>
 </body>
 </html>
