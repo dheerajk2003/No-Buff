@@ -11,19 +11,19 @@
     <source src="http://localhost:8080/video/two.mp4" type="video/mp4">
     Your browser does not support the video tag.
 </video>
-<script>
-    async function getVideo(){
-        const res = await fetch("http://localhost:8080/video/one.mp4",{
-            headers:{
-                Range: "bytes=0-2000",
-                Hd: 1
-            }
-        });
-        console.log(res);
-        const data = res.text();
-        console.log(data);
-    }
-    getVideo();
-</script>
+<!--<script>-->
+<!--    async function getVideo(){-->
+<!--        const res = await fetch("http://localhost:8080/video/one.mp4",{-->
+<!--            headers:{-->
+<!--                Range: "bytes=0-2000",-->
+<!--                Hd: 1-->
+<!--            }-->
+<!--        });-->
+<!--        console.log(res);-->
+<!--        const data = res.text();-->
+<!--        console.log(data);-->
+<!--    }-->
+<!--    getVideo();-->
+<!--</script>-->
 </body>
 </html>
