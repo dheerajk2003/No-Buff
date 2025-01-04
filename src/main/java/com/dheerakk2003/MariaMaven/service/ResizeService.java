@@ -7,22 +7,41 @@ import org.bytedeco.javacv.Frame;
 import org.bytedeco.javacv.OpenCVFrameConverter;
 import org.bytedeco.opencv.opencv_core.Mat;
 import org.bytedeco.opencv.opencv_core.Size;
-import org.springframework.stereotype.Service;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import static org.bytedeco.opencv.global.opencv_imgproc.resize;
-
-
-@Service
+//@Service
 public class ResizeService {
     public static void resizeVideo(String inputFileName, String outputFileName, int width, int height, int bitrate){
-        try{
-            FFmpegFrameGrabber grabber = new FFmpegFrameGrabber(inputFileName);
-            grabber.start();
+        Runnable r = new Task(inputFileName, outputFileName, width, height, bitrate);
+        ExecutorService pool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+        pool.execute(r);
+    }
+}
 
+class Task implements Runnable{
+    String inputFileName, outputFileName;
+    int height, width, bitrate;
+
+    public Task(String inputFileName, String outputFileName, int width, int height, int bitrate) {
+        this.inputFileName = inputFileName;
+        this.outputFileName = outputFileName;
+        this.height = height;
+        this.width = width;
+        this.bitrate = bitrate;
+    }
+
+
+
+    public void run()
+    {
+        try(FFmpegFrameGrabber grabber = new FFmpegFrameGrabber(inputFileName)){
+            grabber.start();
             FFmpegFrameRecorder recorder = new FFmpegFrameRecorder(outputFileName, width, height);
             recorder.setVideoCodec(avcodec.AV_CODEC_ID_H264);
             recorder.setFormat("mp4");
-            recorder.setFrameRate(grabber.getFrameRate());
+            recorder.setFrameRate((grabber.getFrameRate() <= 30) ? grabber.getFrameRate() : 30);
             recorder.setVideoBitrate(bitrate);
             recorder.start();
 
@@ -43,6 +62,7 @@ public class ResizeService {
         }
         catch (Exception e){
             System.out.println(e.getMessage());
+            throw new RuntimeException();
         }
     }
 }

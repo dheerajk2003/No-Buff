@@ -1,6 +1,7 @@
 package com.dheerakk2003.MariaMaven.web;
 
 import com.dheerakk2003.MariaMaven.models.Upload;
+import com.dheerakk2003.MariaMaven.service.ResService;
 import com.dheerakk2003.MariaMaven.service.ResizeService;
 import com.dheerakk2003.MariaMaven.service.StreamService;
 import com.dheerakk2003.MariaMaven.service.UploadService;
@@ -60,11 +61,21 @@ public class UploadController {
     @GetMapping("/uploaded/{fname}")
     public String uploaded(@PathVariable String fname){
         Path uploadPath = UploadDir.resolve(fname);
-        File file = new File(uploadPath.toString());
-        if(file.exists() && !file.isDirectory()){
-            ResizeService.resizeVideo(uploadPath.toString(),"uploads/resized/360p/"+fname,480, 360, 500_00);
-            ResizeService.resizeVideo(uploadPath.toString(),"uploads/resized/720p/"+fname,960, 720, 3500_00);
-            boolean deleted = file.delete();
+        int resolution[] = ResService.CheckRes(uploadPath.toString());
+        float ratio = (float)resolution[0] / resolution[1];
+        int width = (int)(360 * ratio);
+        if(resolution != null){
+            ResizeService.resizeVideo(uploadPath.toString(),"uploads/resized/360p/"+fname,width, 360, 500_00);
+            if(resolution[1] >= 720 ){
+                System.out.println("entered 720");
+                width = (int)(720 * ratio);
+                ResizeService.resizeVideo(uploadPath.toString(),"uploads/resized/720p/"+fname,width, 720, 3500_00);
+            }
+            if(resolution[1] >= 960){
+                System.out.println("entered 1080");
+                width = (int)(960  * ratio);
+                ResizeService.resizeVideo(uploadPath.toString(),"uploads/resized/1080p/"+fname,width, 960, 10000_00);
+            }
             throw new ResponseStatusException(HttpStatus.OK);
         }
         else
@@ -96,6 +107,19 @@ public class UploadController {
             }
         }
         return StreamService.ServeVid(start, end, "720p/"+filename);
+    }
+    @GetMapping("/1080p/{filename}")
+    public Mono<ResponseEntity<byte[]>> ServeVideo10(@RequestHeader(value = "Range", required = false) String rangeHeader, @PathVariable String filename) throws IOException{
+        long start = 0;
+        long end = 0;
+        if(rangeHeader != null && rangeHeader.startsWith("bytes=")){
+            String[] ranges = rangeHeader.substring(6).split("-");
+            start = Long.parseLong(ranges[0]);
+            if(ranges.length > 1 && !ranges[1].isEmpty()){
+                end = Long.parseLong(ranges[1]);
+            }
+        }
+        return StreamService.ServeVid(start, end, "1080p/"+filename);
     }
 }
 
