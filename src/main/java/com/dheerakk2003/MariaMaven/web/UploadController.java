@@ -63,7 +63,7 @@ public class UploadController {
         File file = new File(uploadPath.toString());
         if(file.exists() && !file.isDirectory()){
             ResizeService.resizeVideo(uploadPath.toString(),"uploads/resized/360p/"+fname,480, 360, 500_00);
-            ResizeService.resizeVideo(uploadPath.toString(),"uploads/resized/720p/"+fname,960, 720, 2500_00);
+            ResizeService.resizeVideo(uploadPath.toString(),"uploads/resized/720p/"+fname,960, 720, 3500_00);
             boolean deleted = file.delete();
             throw new ResponseStatusException(HttpStatus.OK);
         }

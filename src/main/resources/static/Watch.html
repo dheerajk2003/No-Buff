@@ -7,11 +7,11 @@
 </head>
 <body>
 <h1>Video Streaming Example</h1>
-<video id="videoPlayer" width="640" height="360" controls>
+<video id="videoPlayer" width="960" height="720" controls>
 
 </video>
-<input type="text" id="filename" placeholder="filename"/>
-<select id="qual">
+<input type="text" id="filename" value="four.mp4" placeholder="filename"/>
+<select id="qual" onchange="changed()">
     <option value="720p/">720</option>
     <option value="360p/">360</option>
 </select>
@@ -27,6 +27,16 @@
         }
         vTag.src = "http://localhost:8080/"+quality+filename;
         vTag.type = "video/mp4";
+    }
+    async function changed(){
+        console.log("changed");
+        const vTag = document.getElementById("videoPlayer");
+        const playTime = vTag.currentTime;
+        await getVideo();
+        vTag.addEventListener("loadedmetadata", function () {
+            vTag.currentTime = playTime;
+            vTag.play();
+        });
     }
 </script>
 </body>

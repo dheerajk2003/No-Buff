@@ -34,4 +34,6 @@ build/
 
 ### uploaded videos ###
 
-/uploads
+#/uploads
+
+*.mp4
