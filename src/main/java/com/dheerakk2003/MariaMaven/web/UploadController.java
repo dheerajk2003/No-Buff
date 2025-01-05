@@ -5,6 +5,7 @@ import com.dheerakk2003.MariaMaven.service.ResService;
 import com.dheerakk2003.MariaMaven.service.ResizeService;
 import com.dheerakk2003.MariaMaven.service.StreamService;
 import com.dheerakk2003.MariaMaven.service.UploadService;
+import jdk.jfr.StackTrace;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,6 +20,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.Optional;
+import java.util.UUID;
 
 @RestController
 public class UploadController {
@@ -37,14 +39,23 @@ public class UploadController {
         return u.get().getFilename();
     }
 
-    @PostMapping("/file")
-    public ResponseEntity<String> upload(@RequestParam("chunk") MultipartFile chunk,@RequestParam("userId") Long userId, @RequestParam("filename") String filename) throws IOException {
+    @PostMapping("/upload")
+    public String uploadVideo(@RequestBody Upload up){
         try{
-            if(us.findByName(filename) != null){
-                Upload u = new Upload(userId, filename);
-                us.save(u);
-            }
+            String filename = UUID.randomUUID().toString()+".mp4";
+            up.setFilename(filename);
+            us.save(up);
+            return filename;
+        }
+        catch(Exception e){
+            System.out.println(e.getMessage());
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+        }
+    }
 
+    @PostMapping("/file")
+    public ResponseEntity<String> upload(@RequestParam("chunk") MultipartFile chunk, @RequestParam("filename") String filename) throws IOException {
+        try{
             Path UploadPath = UploadDir.resolve(filename);
             Files.createDirectories(UploadPath.getParent());
             Files.write(UploadPath, chunk.getBytes(), StandardOpenOption.CREATE, StandardOpenOption.APPEND);
@@ -62,24 +73,33 @@ public class UploadController {
     public String uploaded(@PathVariable String fname){
         Path uploadPath = UploadDir.resolve(fname);
         int resolution[] = ResService.CheckRes(uploadPath.toString());
+        if(resolution == null) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
         float ratio = (float)resolution[0] / resolution[1];
         int width = (int)(360 * ratio);
-        if(resolution != null){
-            ResizeService.resizeVideo(uploadPath.toString(),"uploads/resized/360p/"+fname,width, 360, 500_00);
-            if(resolution[1] >= 720 ){
-                System.out.println("entered 720");
-                width = (int)(720 * ratio);
-                ResizeService.resizeVideo(uploadPath.toString(),"uploads/resized/720p/"+fname,width, 720, 3500_00);
-            }
-            if(resolution[1] >= 960){
-                System.out.println("entered 1080");
-                width = (int)(960  * ratio);
-                ResizeService.resizeVideo(uploadPath.toString(),"uploads/resized/1080p/"+fname,width, 960, 10000_00);
-            }
-            throw new ResponseStatusException(HttpStatus.OK);
+        int taskCount = 1;
+        ResizeService.resizeVideo(uploadPath.toString(),"uploads/resized/360p/"+fname,width, 360, 1000_00);
+
+        if(resolution[1] >= 720 ){
+            System.out.println("entered 720");
+            width = (int)(720 * ratio);
+            ResizeService.resizeVideo(uploadPath.toString(),"uploads/resized/720p/"+fname,width, 720, 3500_00);
+            taskCount++;
         }
-        else
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
+
+        if(resolution[1] >= 960){
+            System.out.println("entered 1080");
+            width = (int)(960  * ratio);
+            ResizeService.resizeVideo(uploadPath.toString(),"uploads/resized/1080p/"+fname,width, 960, 10000_00);
+            taskCount++;
+        }
+        ResizeService.awaitCompletion(uploadPath.toString(), taskCount);
+        throw new ResponseStatusException(HttpStatus.OK);
+
+
+
     }
 
     @GetMapping("/360p/{filename}")

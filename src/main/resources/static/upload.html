@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        *{
+            box-sizing: border-box;
+        }
+        body{
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background-color: lightgray;
+        }
+        h1{
+            font-weight: bold;
+        }
+        #box{
+            width: 40%;
+            height: 60%;
+            padding: 50px;
+            border-radius: 50px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-around;
+            background-color: white;
+        }
+        input, #out{
+            width: 70%;
+            height: 45px;
+            border: 2px solid black;
+            border-radius: 10px;
+            padding-left: 10px;
+        }
+        #out{
+            padding-left: 0px;
+            overflow: hidden;
+        }
+        #in{
+            width: 0%;
+            height: 100%;
+            background-color: skyblue;
+        }
+        button{
+            width: 70%;
+            height: 45px;
+            background-color: black;
+            border-radius: 10px;
+            color : white;
+        }
+        a{
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            color: black;
+            font-decoration: none;
+        }
+        #chunk{
+            padding: 10px 10px;
+        }
+
+    </style>
+</head>
+<body>
+    <a href="/watch.html" >watch</a>
+
+    <div id="box">
+        <h1>Upload Video</h1>
+        <input type="file" id="chunk" />
+        <input type="text" id="title" placeholder="Enter Title" name="title"/>
+        <div id="out">
+            <div id="in">
+
+            </div>
+        </div>
+        <button onclick="Upload()">Submit</button>
+    </div>
+
+    <script>
+        async function sendChunk(filename, file){
+            const chunk_size = 5*1024*1024;
+            const inBox = document.getElementById("in");
+            let start = 0;
+            while(start < file.size){
+                const chunk = file.slice(start, start+chunk_size);
+                const formData = new FormData();
+                formData.append("chunk",chunk);
+                formData.append("filename", filename);
+                const response = await fetch("/file", {
+                    method: "POST",
+                    body: formData
+                });
+                if(response.status != 200){
+                    alert("failed");
+                    break;
+                }
+                start += chunk_size;
+                inBox.style.width = (start/file.size)*100;
+            }
+
+            const r = await fetch(`/uploaded/${filename}`);
+            console.log(r);
+            const d = await r.text();
+            console.log(d);
+        }
+        async function Upload(){
+            const file = document.getElementById("chunk").files[0];
+            const title = document.getElementById("title").value;
+            const userId = localStorage.getItem("token");
+
+
+            if(file != null && userId != null && title != null)
+            {
+                const fd = {
+                    "userId": userId,
+                    "title": title,
+                    "filename" : ""
+                }
+                const res = await fetch("/upload", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json' // Indicate JSON format
+                    },
+                    body: JSON.stringify(fd)
+                });
+                const data = await res.text();
+                if(!res.ok || data == ""){
+                    alert("error");
+                    return;
+                }
+
+                await sendChunk(data, file);
+
+            } else {
+                alert("fill all entries");
+                return;
+            }
+
+        }
+    </script>
+</body>
+</html>

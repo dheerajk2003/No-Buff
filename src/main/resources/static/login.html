@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        body{
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background-color: lightgray;
+        }
+        h1{
+            font-weight: bold;
+        }
+        form{
+            width: 40%;
+            height: 60%;
+            padding: 50px;
+            border-radius: 50px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-around;
+            background-color: white;
+        }
+        input{
+            width: 70%;
+            height: 45px;
+            border: 2px solid black;
+            border-radius: 10px;
+            padding-left: 10px;
+        }
+        button{
+            width: 70%;
+            height: 45px;
+            background-color: black;
+            border-radius: 10px;
+            color : white;
+        }
+    </style>
+</head>
+<body>
+<form id="form">
+    <h1>Login</h1>
+    <input type="text" name="email" id="email" placeholder="Enter Email" />
+    <input type="password" name="password" id="password" placeholder="Enter Password" />
+    <button type="submit" id="button">Login</button>
+</form>
+
+<script>
+    const form = document.getElementById("form");
+
+    form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const formData = new FormData(e.target);
+        const formDataObj = Object.fromEntries(formData.entries());
+        try{
+            const res = await fetch(`/checkuser/${formDataObj.email}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'password': formDataObj.password
+                }
+            });
+
+            if(res.ok){
+                const data = await res.text();
+                console.log(data);
+                localStorage.setItem("token", data);
+            }
+            else if(res.NOT_FOUND){
+                alert("email not found");
+            }
+            else if(res.BAD_REQUEST){
+                alert("wrong password");
+            }
+        }
+        catch(e){
+            console.log(e);
+        }
+    });
+</script>
+</body>
+</html>

@@ -16,11 +16,19 @@ public class Upload {
 
     private String filename;
 
+    private String title;
+
     public Upload(){}
 
     public Upload(Long userId, String filename) {
         this.userId = userId;
         this.filename = filename;
+    }
+
+    public Upload(Long userId, String filename, String title) {
+        this.userId = userId;
+        this.filename = filename;
+        this.title = title;
     }
 
     public Long getId() {

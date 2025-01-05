@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        body{
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background-color: lightgray;
+        }
+        h1{
+            font-weight: bold;
+        }
+        form{
+            width: 40%;
+            height: 60%;
+            padding: 50px;
+            border-radius: 50px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-around;
+            background-color: white;
+        }
+        input{
+            width: 70%;
+            height: 45px;
+            border: 2px solid black;
+            border-radius: 10px;
+            padding-left: 10px;
+        }
+        button{
+            width: 70%;
+            height: 45px;
+            background-color: black;
+            border-radius: 10px;
+            color : white;
+        }
+    </style>
+</head>
+<body>
+        <form id="form">
+            <h1>Registration</h1>
+            <input type="text" name="fullName" id="name" placeholder="Enter Name"/>
+            <input type="text" name="email" id="email" placeholder="Enter Email" />
+            <input type="password" name="password" id="password" placeholder="Enter Password" />
+            <button type="submit" id="button">Register</button>
+        </form>
+
+    <script>
+        const form = document.getElementById("form");
+
+        form.addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const formDataObj = Object.fromEntries(formData.entries());
+            try{
+                const res = await fetch("/user", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formDataObj)
+                });
+
+                if(!res.ok){
+                    alert("registration failed");
+                    return;
+                }
+                const data = await res.text();
+                localStorage.setItem("token" , data );
+                alert(data);
+            }
+            catch(e){
+                console.log(e);
+            }
+        });
+    </script>
+</body>
+</html>

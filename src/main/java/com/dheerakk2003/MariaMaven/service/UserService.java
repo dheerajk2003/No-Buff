@@ -50,4 +50,8 @@ public class UserService {
         ur.deleteById(id);
         throw new ResponseStatusException(HttpStatus.OK);
     }
+
+    public void update(User u){
+        ur.updateUser(u.getFullName(), u.getEmail(), u.getPassword(), u.getId());
+    }
 }

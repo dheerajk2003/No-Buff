@@ -7,16 +7,50 @@ import org.bytedeco.javacv.Frame;
 import org.bytedeco.javacv.OpenCVFrameConverter;
 import org.bytedeco.opencv.opencv_core.Mat;
 import org.bytedeco.opencv.opencv_core.Size;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
+
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.concurrent.*;
 
 import static org.bytedeco.opencv.global.opencv_imgproc.resize;
 //@Service
 public class ResizeService {
+    private static final ExecutorService pool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+    private static final CompletionService<Boolean> completionService = new ExecutorCompletionService<>(pool);
+
     public static void resizeVideo(String inputFileName, String outputFileName, int width, int height, int bitrate){
-        Runnable r = new Task(inputFileName, outputFileName, width, height, bitrate);
-        ExecutorService pool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
-        pool.execute(r);
+        Runnable task = new Task(inputFileName, outputFileName, width, height, bitrate);
+        completionService.submit(task, true);
+    }
+
+    public static boolean deleteVideo(String filename){
+        Path filepath = Paths.get(filename);
+        try{
+            return Files.deleteIfExists(filepath);
+        }
+        catch (Exception e){
+            System.out.println(e.getMessage());
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    public static void awaitCompletion(String originalFile, int taskCount){
+        try{
+            for(int i=0; i<taskCount; i++){
+                Future<Boolean> result = completionService.take();
+                if(!result.get()){
+                    throw new RuntimeException("task failed");
+                }
+            }
+            deleteVideo(originalFile);
+        }
+        catch (Exception e){
+            System.out.println("Error waiting for tasks to complete : " + e.getMessage());
+            throw new RuntimeException(e);
+        }
     }
 }
 

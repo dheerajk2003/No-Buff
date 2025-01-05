@@ -2,7 +2,10 @@ package com.dheerakk2003.MariaMaven.web;
 
 import com.dheerakk2003.MariaMaven.models.User;
 import com.dheerakk2003.MariaMaven.service.UserService;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 @RestController
 public class PjOne {
@@ -25,8 +28,15 @@ public class PjOne {
     }
 
     @GetMapping("/checkuser/{email}")
-    public User get(@PathVariable String email){
-        return us.getByEmail(email);
+    public ResponseEntity<String> get(@PathVariable String email, @RequestHeader(value = "password", required = true) String password){
+        User u = us.getByEmail(email);
+        if(u != null) {
+            System.out.println("password = " + password + u.getPassword());
+            if (!u.getPassword().equals(password))
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("wrong Password");
+            return ResponseEntity.ok(u.getId().toString());
+        }
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Invalid user");
     }
 
     @DeleteMapping("/user/{id}")
@@ -39,5 +49,14 @@ public class PjOne {
         return us.save(u);
     }
 
-
+    @PutMapping("/user")
+    public ResponseEntity edit(@RequestBody User u) {
+        try{
+            us.update(u);
+            return ResponseEntity.ok("updated");
+        }
+        catch (Exception e){
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 }

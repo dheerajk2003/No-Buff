@@ -19,18 +19,12 @@ public class User {
 
     private String password;
 
-    private String phoneNumber;
-
-    private String upiId;
-
     public User(){}
 
-    public User(String fullName, String email, String password, String phoneNumber, String upiId) {
+    public User(String fullName, String email, String password) {
         this.fullName = fullName;
         this.email = email;
         this.password = password;
-        this.phoneNumber = phoneNumber;
-        this.upiId = upiId;
     }
 
     public Long getId() {
@@ -49,14 +43,6 @@ public class User {
         return password;
     }
 
-    public String getPhoneNumber() {
-        return phoneNumber;
-    }
-
-    public String getUpiId() {
-        return upiId;
-    }
-
     public void setId(Long id) {
         this.id = id;
     }
@@ -71,14 +57,6 @@ public class User {
 
     public void setPassword(String password) {
         this.password = password;
-    }
-
-    public void setPhoneNumber(String phoneNumber) {
-        this.phoneNumber = phoneNumber;
-    }
-
-    public void setUpiId(String upiId) {
-        this.upiId = upiId;
     }
 
 
