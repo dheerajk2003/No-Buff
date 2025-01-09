@@ -30,21 +30,12 @@
             justify-content: space-around;
             background-color: white;
         }
-        input, #out{
-            width: 70%;
+        input{
+            width: 100%;
             height: 45px;
             border: 2px solid black;
             border-radius: 10px;
             padding-left: 10px;
-        }
-        #out{
-            padding-left: 0px;
-            overflow: hidden;
-        }
-        #in{
-            width: 0%;
-            height: 100%;
-            background-color: skyblue;
         }
         button{
             width: 70%;
@@ -63,28 +54,36 @@
         #chunk{
             padding: 10px 10px;
         }
+        .inputBox{
+            width: 75%;
+        }
 
     </style>
 </head>
 <body>
-    <a href="/watch.html" >watch</a>
+    <a href="/testit/5" >watch</a>
 
     <div id="box">
         <h1>Upload Video</h1>
-        <input type="file" id="chunk" />
-        <input type="text" id="title" placeholder="Enter Title" name="title"/>
-        <div id="out">
-            <div id="in">
-
-            </div>
+        <div class="inputBox">
+            <p>Title</p>
+            <input type="text" id="title" placeholder="Enter Title" name="title"/>
         </div>
+        <div class="inputBox">
+            <p>Image</p>
+            <input type="file" id="image" />
+        </div>
+        <div class="inputBox">
+            <p>Video</p>
+            <input type="file" id="chunk" />
+        </div>
+
         <button onclick="Upload()">Submit</button>
     </div>
 
     <script>
         async function sendChunk(filename, file){
             const chunk_size = 5*1024*1024;
-            const inBox = document.getElementById("in");
             let start = 0;
             while(start < file.size){
                 const chunk = file.slice(start, start+chunk_size);
@@ -100,7 +99,6 @@
                     break;
                 }
                 start += chunk_size;
-                inBox.style.width = (start/file.size)*100;
             }
 
             const r = await fetch(`/uploaded/${filename}`);
@@ -109,24 +107,20 @@
             console.log(d);
         }
         async function Upload(){
-            const file = document.getElementById("chunk").files[0];
             const title = document.getElementById("title").value;
             const userId = localStorage.getItem("token");
+            const image = document.getElementById("image").files[0];
+            const file = document.getElementById("chunk").files[0];
 
-
-            if(file != null && userId != null && title != null)
+            if(image != null && file != null && userId != null && title != null)
             {
-                const fd = {
-                    "userId": userId,
-                    "title": title,
-                    "filename" : ""
-                }
+                const fd = new FormData();
+                fd.append("title", title);
+                fd.append("userId", userId);
+                fd.append("image", image);
                 const res = await fetch("/upload", {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json' // Indicate JSON format
-                    },
-                    body: JSON.stringify(fd)
+                    body: fd
                 });
                 const data = await res.text();
                 if(!res.ok || data == ""){

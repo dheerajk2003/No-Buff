@@ -1,40 +1,49 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Video Streaming</title>
 </head>
 <body>
+<input type="hidden" id="pageId" th:value="${filename}">
 <h1>Video Streaming Example</h1>
-<video id="videoPlayer" width="960" height="720" controls>
+<video id="videoPlayer" controls>
 
 </video>
-<input type="text" id="filename" value="two.mp4" placeholder="filename"/>
 <select id="qual" onchange="changed()">
-    <option value="360p/">360</option>
-    <option value="720p/">720</option>
-    <option value="1080p/">1080</option>
+    <option value="360p/">Low</option>
+    <option value="720p/">Medium</option>
+    <option value="1080p/">High</option>
 </select>
-<button onclick="getVideo()">See</button>
-<a href="/upload-chunk.html" >upload</a>
 <script>
-    function getVideo(){
+
+    window.onload = function(){
+        const filename = document.getElementById("pageId").value;
+        getVideo(filename);
+    }
+    
+    function getVideo(filename){
         const vTag = document.getElementById("videoPlayer");
         const quality = document.getElementById("qual").value;
-        const filename = document.getElementById("filename").value;
-        if(!quality || !filename){
+        if(quality == null || quality == "")
+            quality = "360p/";
+        if(!filename){
             alert("fill all entries");
             return;
         }
         vTag.src = "http://localhost:8080/"+quality+filename;
         vTag.type = "video/mp4";
+        vTag.addEventListener("loadedmetadata", function () {
+            vTag.play();
+        });
     }
     async function changed(){
         console.log("changed");
         const vTag = document.getElementById("videoPlayer");
         const playTime = vTag.currentTime;
-        await getVideo();
+        const filename = document.getElementById("pageId").value;
+        await getVideo(filename);
         vTag.addEventListener("loadedmetadata", function () {
             vTag.currentTime = playTime;
             vTag.play();

@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -17,6 +18,10 @@ public class UploadService {
 
     public Iterable<Upload> findByUserId(Long userId){
         return ur.findByUserId(userId);
+    }
+
+    public Iterable<Upload> getVids(Long id){
+        return ur.findAll();
     }
 
     public Optional<Upload> get(Long id){

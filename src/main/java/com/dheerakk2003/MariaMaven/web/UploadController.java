@@ -1,13 +1,14 @@
 package com.dheerakk2003.MariaMaven.web;
 
 import com.dheerakk2003.MariaMaven.models.Upload;
-import com.dheerakk2003.MariaMaven.service.ResService;
-import com.dheerakk2003.MariaMaven.service.ResizeService;
-import com.dheerakk2003.MariaMaven.service.StreamService;
-import com.dheerakk2003.MariaMaven.service.UploadService;
+import com.dheerakk2003.MariaMaven.models.User;
+import com.dheerakk2003.MariaMaven.service.*;
 import jdk.jfr.StackTrace;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
@@ -22,15 +23,19 @@ import java.nio.file.StandardOpenOption;
 import java.util.Optional;
 import java.util.UUID;
 
-@RestController
+//@RestController
+@Controller
 public class UploadController {
 
     private static final Path UploadDir = Paths.get("uploads/uploaded/");
+    private static final Path imageDir = Paths.get("uploads/images");
 
     private final UploadService us;
 
-    public UploadController(UploadService us){
+    private final UserService userService;
+    public UploadController(UploadService us, UserService userService){
         this.us = us;
+        this.userService = userService;
     }
 
     @GetMapping("/file/{id}")
@@ -39,17 +44,35 @@ public class UploadController {
         return u.get().getFilename();
     }
 
+    @GetMapping("/allvid")
+    @ResponseBody
+    public Iterable<Upload> getVids(@RequestHeader("id") Long id){
+        User user = userService.get(id);
+        if(user != null){
+            return us.getVids(id);
+        }
+        else{
+           throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+        }
+    }
+
     @PostMapping("/upload")
-    public String uploadVideo(@RequestBody Upload up){
+    public ResponseEntity<String> uploadVideo(@RequestParam("userId") Long userId, @RequestParam("title") String title, @RequestParam("image") MultipartFile image){
         try{
-            String filename = UUID.randomUUID().toString()+".mp4";
-            up.setFilename(filename);
+            Upload up = new Upload();
+            String filename = UUID.randomUUID().toString();
+            up.setFilename(filename+".mp4");
+            up.setImage(filename);
+            up.setTitle(title);
+            up.setUserId(userId);
+            Path imgPath = imageDir.resolve(filename+".jpeg");
+            Files.write(imgPath, image.getBytes());
             us.save(up);
-            return filename;
+            return ResponseEntity.ok(filename+".mp4");
         }
         catch(Exception e){
             System.out.println(e.getMessage());
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
     }
 
@@ -97,9 +120,6 @@ public class UploadController {
         }
         ResizeService.awaitCompletion(uploadPath.toString(), taskCount);
         throw new ResponseStatusException(HttpStatus.OK);
-
-
-
     }
 
     @GetMapping("/360p/{filename}")
@@ -140,6 +160,17 @@ public class UploadController {
             }
         }
         return StreamService.ServeVid(start, end, "1080p/"+filename);
+    }
+
+    @GetMapping("/getimg/{imgname}")
+    public ResponseEntity<byte[]> getImage(@PathVariable String imgname){
+        return StreamService.getImage(imgname);
+    }
+
+    @GetMapping("/watch/{filename}")
+    public String watchVid(@PathVariable String filename, Model model){
+        model.addAttribute("filename", filename);
+        return "watch";
     }
 }
 

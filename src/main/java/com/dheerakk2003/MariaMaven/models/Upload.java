@@ -1,11 +1,12 @@
 package com.dheerakk2003.MariaMaven.models;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import jakarta.persistence.*;
+import org.hibernate.annotations.Type;
 
 @Entity
+@Table(name = "UPLOAD")
 public class Upload {
 
     @Id
@@ -18,6 +19,9 @@ public class Upload {
 
     private String title;
 
+    @Column(name = "image")
+    private String image;
+
     public Upload(){}
 
     public Upload(Long userId, String filename) {
@@ -25,10 +29,11 @@ public class Upload {
         this.filename = filename;
     }
 
-    public Upload(Long userId, String filename, String title) {
+    public Upload(Long userId, String filename, String title, String image) {
         this.userId = userId;
         this.filename = filename;
         this.title = title;
+        this.image = image;
     }
 
     public Long getId() {
@@ -49,5 +54,21 @@ public class Upload {
 
     public void setFilename(String filename) {
         this.filename = filename;
+    }
+
+    public String getImage() {
+        return image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
     }
 }

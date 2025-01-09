@@ -4,13 +4,18 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Mono;
 
-import java.io.IOException;
+import java.io.*;
 import java.nio.ByteBuffer;
 import java.nio.channels.AsynchronousFileChannel;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Stream;
 
 @Service
 public class StreamService {
@@ -54,5 +59,20 @@ public class StreamService {
                 throw new RuntimeException("Error processing video stream", e);
             }
         });
+    }
+
+    public static ResponseEntity<byte[]> getImage(String filename){
+        try{
+            File file = new File("uploads/images/" + filename);
+            if(file == null)
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+            byte[] data = Files.readAllBytes(file.toPath());
+            HttpHeaders header = new HttpHeaders();
+            header.add(HttpHeaders.CONTENT_TYPE, Files.probeContentType(file.toPath()));
+            return new ResponseEntity<>(data, header, HttpStatus.OK);
+        }
+        catch (Exception e){
+            throw new RuntimeException(e);
+        }
     }
 }

@@ -10,5 +10,6 @@ create table if not exists UPLOAD
 (
     id bigint primary key auto_increment,
     userId bigint references USER(id),
-    filename varchar(255)
+    filename varchar(255),
+    image varchar(255)
 );
