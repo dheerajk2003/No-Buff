@@ -3,8 +3,6 @@ package com.dheerakk2003.MariaMaven.web;
 import com.dheerakk2003.MariaMaven.models.Upload;
 import com.dheerakk2003.MariaMaven.models.User;
 import com.dheerakk2003.MariaMaven.service.*;
-import jdk.jfr.StackTrace;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -14,7 +12,6 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Mono;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -39,9 +36,10 @@ public class UploadController {
     }
 
     @GetMapping("/file/{id}")
-    public String get(@PathVariable Long id){
+    @ResponseBody
+    public Upload get(@PathVariable Long id){
         Optional<Upload> u = us.get(id);
-        return u.get().getFilename();
+        return u.get();
     }
 
     @GetMapping("/allvid")
@@ -167,9 +165,9 @@ public class UploadController {
         return StreamService.getImage(imgname);
     }
 
-    @GetMapping("/watch/{filename}")
-    public String watchVid(@PathVariable String filename, Model model){
-        model.addAttribute("filename", filename);
+    @GetMapping("/watch/{id}")
+    public String watchVid(@PathVariable Long id, Model model){
+        model.addAttribute("id", id);
         return "watch";
     }
 }

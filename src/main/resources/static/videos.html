@@ -1,148 +1,178 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-    <style>
-        * {
-  box-sizing: border-box;
-}
+  <meta charset="UTF-8">
+  <title>Title</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
-body {
-  display: grid;
-  place-items: center;
-  min-height: 100vh;
-  width: 100vw;
-}
+    body {
+      width: 100vw;
+      padding: 0 50px;
+    }
 
-#container {
-    width: 100vw;
-    display: grid;
-    grid-gap: 10px; /* Space between grid items */
-    grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
-}
+    nav {
+      width: 100%;
+      height: 75px;
+      color: black;
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      margin-bottom: 30px;
+      align-items: center;
+    }
 
-.card {
-  --blur: 16px;
-  --size: clamp(300px, 50vmin, 600px);
-  width: 450px;
-  aspect-ratio: 4 / 3;
-  position: relative;
-  border-radius: 2rem;
-  overflow: hidden;
-  color: #000;
-  transform: translateZ(0);
-}
+    ul {
+      list-style-type: none;
+    }
 
-.card__img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transform: scale(calc(1 + (var(--hover, 0) * 0.25))) rotate(calc(var(--hover, 0) * -5deg));
-  transition: transform 0.2s;
-}
+    li {
+      display: inline;
+      margin: 10px;
+    }
 
-.card__footer {
-  padding: 0 1.5rem;
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  background: red;
-  display: grid;
-  grid-template-row: auto auto;
-  gap: 0.5ch;
-  background: hsl(0 0% 100% / 0.5);
-  backdrop-filter: blur(var(--blur));
-  height: 30%;
-  align-content: center;
-}
+    h2 {
+      font-size: xx-large;
+      font-weight: bold;
+    }
 
-.card__action {
-  position: absolute;
-  aspect-ratio: 1;
-  width: calc(var(--size) * 0.15);
-  bottom: 30%;
-  right: 1.5rem;
-  transform: translateY(50%)
-    translateY(
-      calc(
-        (var(--size) * 0.4)
-      )
-    )
-    translateY(calc(var(--hover, 0) * (var(--size) * -0.4)));
-  background: purple;
-  display: grid;
-  place-items: center;
-  border-radius: 0.5rem;
-  background: hsl(0 0% 100% / 0.5);
-/*   backdrop-filter: blur(calc(var(--blur) * 0.5)); */
-  transition: transform 0.2s;
-}
+    a {
+      color: black;
+      font-size: larger;
+      font-family: cursive;
+      text-decoration: none;
+      font-weight: bold;
+    }
 
-.card__action svg {
-  aspect-ratio: 1;
-  width: 50%;
-}
+    #container {
+      width: 100vw;
+      display: grid;
+      grid-gap: 10px;
+      /* Space between grid items */
+      grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+    }
 
-.card__footer span:nth-of-type(1) {
-  font-size: calc(var(--size) * 0.065);
-}
+    .card {
+      --blur: 16px;
+      --size: clamp(300px, 50vmin, 600px);
+      width: 450px;
+      aspect-ratio: 4 / 3;
+      position: relative;
+      border-radius: 2rem;
+      overflow: hidden;
+      color: #000;
+      transform: translateZ(0);
+    }
 
-.card__footer span:nth-of-type(2) {
-  font-size: calc(var(--size) * 0.035);
-}
+    .card__img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transform: scale(calc(1 + (var(--hover, 0) * 0.25))) rotate(calc(var(--hover, 0) * -5deg));
+      transition: transform 0.2s;
+    }
 
-.card:is(:hover, :focus-visible) {
-  --hover: 1;
-}
-    </style>
+    .card__footer {
+      padding: 0 1.5rem;
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      background: red;
+      display: grid;
+      grid-template-row: auto auto;
+      gap: 0.5ch;
+      background: hsl(0 0% 100% / 0.5);
+      backdrop-filter: blur(var(--blur));
+      height: 30%;
+      align-content: center;
+    }
+
+    .card__action {
+      position: absolute;
+      aspect-ratio: 1;
+      width: calc(var(--size) * 0.15);
+      bottom: 30%;
+      right: 1.5rem;
+      transform: translateY(50%) translateY(calc((var(--size) * 0.4))) translateY(calc(var(--hover, 0) * (var(--size) * -0.4)));
+      background: purple;
+      display: grid;
+      place-items: center;
+      border-radius: 0.5rem;
+      background: hsl(0 0% 100% / 0.5);
+      /*   backdrop-filter: blur(calc(var(--blur) * 0.5)); */
+      transition: transform 0.2s;
+    }
+
+    .card__action svg {
+      aspect-ratio: 1;
+      width: 50%;
+    }
+
+    .card__footer span:nth-of-type(1) {
+      font-size: calc(var(--size) * 0.065);
+    }
+
+    .card__footer span:nth-of-type(2) {
+      font-size: calc(var(--size) * 0.035);
+    }
+
+    .card:is(:hover, :focus-visible) {
+      --hover: 1;
+    }
+  </style>
 </head>
-<body>
-    <div id="container">
-        <a href="#" class="card">
-            <img src="https://images.unsplash.com/photo-1526297003708-f5a1c2c9c6e7?crop=entropy&cs=tinysrgb&fm=jpg&ixid=MnwzMjM4NDZ8MHwxfHJhbmRvbXx8fHx8fHx8fDE2NjI0OTY1ODM&ixlib=rb-1.2.1&q=80" alt="balloon with an emoji face" class="card__img">
-            <span class="card__footer">
-                <span>Awesome speedy card</span>
-                <span>2 minutes!</span>
-            </span>
-        </a>
-        <a href="#" class="card">
-            <img src="https://images.unsplash.com/photo-1526297003708-f5a1c2c9c6e7?crop=entropy&cs=tinysrgb&fm=jpg&ixid=MnwzMjM4NDZ8MHwxfHJhbmRvbXx8fHx8fHx8fDE2NjI0OTY1ODM&ixlib=rb-1.2.1&q=80" alt="balloon with an emoji face" class="card__img">
-            <span class="card__footer">
-                <span>Awesome speedy card</span>
-                <span>2 minutes!</span>
-            </span>
-        </a>
-    </div>
 
-    <script>
-        function render(data){
-            const container = document.getElementById("container");
-            for(i=0; i<data.length; i++){
-                const card = `<a href="/watch/${data[i].filename}" class="card">
+<body>
+  <nav>
+    <h2>NoBuff</h2>
+    <ul>
+      <li><a href="/videos.html">HOME</a></li>
+      <li><a href="/upload.html">UPLOAD</a></li>
+    </ul>
+  </nav>
+  <div id="container">
+  </div>
+
+  <script>
+
+        const token = localStorage.getItem("token");
+        if(token == null){
+            window.location.href = "/login.html";
+        }
+    function render(data) {
+      const container = document.getElementById("container");
+      for (i = 0; i < data.length; i++) {
+        console.log(data[i].id);
+        const card = `<a href="/watch/${data[i].id}" class="card">
             <img src="/getimg/${data[i].image}.jpeg" alt="balloon with an emoji face" class="card__img">
             <span class="card__footer">
                 <span>${data[i].title}</span>
 
             </span>
         </a>`;
-            container.innerHTML += card;
-            }
+        container.innerHTML += card;
+      }
+    }
+    async function getVids() {
+      const res = await fetch("/allvid", {
+        headers: {
+          'id': localStorage.getItem('token')
         }
-        async function getVids(){
-            const res = await fetch("/allvid",{
-                headers:{
-                    'id': localStorage.getItem('token')
-                }
-            });
-            const data = await res.json();
-            console.log(data);
-            render(data);
-        }
-        getVids();
+      });
+      const data = await res.json();
+      console.log(data);
+      render(data);
+    }
+    getVids();
 
 
-    </script>
+  </script>
 </body>
+
 </html>

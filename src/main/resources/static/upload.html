@@ -1,13 +1,60 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
     <style>
-        *{
+        * {
             box-sizing: border-box;
+            margin: 0;
+            padding: 0;
         }
+
         body{
+            width: 100vw;
+            height: 100vh;
+            background-color: lightgray;
+            padding: 0 50px;
+        }
+
+        nav {
+            /* position: absolute;
+            top: 0;
+            left: 0; */
+            width: 100%;
+            height: 75px;
+            color: black;
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            /* margin-bottom: 30px; */
+            align-items: center;
+        }
+
+        ul {
+            list-style-type: none;
+        }
+
+        li {
+            display: inline;
+            margin: 10px;
+        }
+
+        h2 {
+            font-size: xx-large;
+            font-weight: bold;
+        }
+
+        .navLink {
+            color: black;
+            font-size: larger;
+            font-family: cursive;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .outbox {
             width: 100vw;
             height: 100vh;
             display: flex;
@@ -16,10 +63,12 @@
             align-items: center;
             background-color: lightgray;
         }
-        h1{
+
+        h1 {
             font-weight: bold;
         }
-        #box{
+
+        #box {
             width: 40%;
             height: 60%;
             padding: 50px;
@@ -30,71 +79,80 @@
             justify-content: space-around;
             background-color: white;
         }
-        input{
+
+        input {
             width: 100%;
             height: 45px;
             border: 2px solid black;
             border-radius: 10px;
             padding-left: 10px;
+            padding: 10px 10px;
         }
-        button{
+
+        button {
             width: 70%;
             height: 45px;
             background-color: black;
             border-radius: 10px;
-            color : white;
+            color: white;
         }
-        a{
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            color: black;
-            font-decoration: none;
-        }
-        #chunk{
-            padding: 10px 10px;
-        }
-        .inputBox{
+
+        .inputBox {
             width: 75%;
         }
-
     </style>
 </head>
+
 <body>
-    <a href="/testit/5" >watch</a>
+    <nav>
+        <h2>NoBuff</h2>
+        <ul>
+            <li><a class="navLink" href="/videos.html">HOME</a></li>
+            <li><a class="navLink" href="/upload.html">UPLOAD</a></li>
+        </ul>
+    </nav>
 
-    <div id="box">
-        <h1>Upload Video</h1>
-        <div class="inputBox">
-            <p>Title</p>
-            <input type="text" id="title" placeholder="Enter Title" name="title"/>
-        </div>
-        <div class="inputBox">
-            <p>Image</p>
-            <input type="file" id="image" />
-        </div>
-        <div class="inputBox">
-            <p>Video</p>
-            <input type="file" id="chunk" />
-        </div>
+    <div class="outbox">
+        <div id="box">
+            <h1>Upload Video</h1>
+            <div class="inputBox">
+                <p>Title</p>
+                <input type="text" id="title" placeholder="Enter Title" name="title" />
+            </div>
+            <div class="inputBox">
+                <p>Image</p>
+                <input type="file" id="image" />
+            </div>
+            <div class="inputBox">
+                <p>Video</p>
+                <input type="file" id="chunk" />
+            </div>
 
-        <button onclick="Upload()">Submit</button>
+            <h1 id="message"></h1>
+
+            <button onclick="Upload()">Submit</button>
+        </div>
     </div>
 
     <script>
-        async function sendChunk(filename, file){
-            const chunk_size = 5*1024*1024;
+        const token = localStorage.getItem("token");
+        if(token == null){
+            window.location.href = "/login.html";
+        }
+        const msg = document.getElementById("message");
+        async function sendChunk(filename, file) {
+            const chunk_size = 5 * 1024 * 1024;
             let start = 0;
-            while(start < file.size){
-                const chunk = file.slice(start, start+chunk_size);
+            while (start < file.size) {
+                const chunk = file.slice(start, start + chunk_size);
                 const formData = new FormData();
-                formData.append("chunk",chunk);
+                formData.append("chunk", chunk);
                 formData.append("filename", filename);
                 const response = await fetch("/file", {
                     method: "POST",
                     body: formData
                 });
-                if(response.status != 200){
+                if (response.status != 200) {
                     alert("failed");
                     break;
                 }
@@ -102,18 +160,21 @@
             }
 
             const r = await fetch(`/uploaded/${filename}`);
-            console.log(r);
+            if (!r.ok) {
+                alert("failed");
+                return;
+            }
+            msg.innerHTML = "File uploaded";
             const d = await r.text();
             console.log(d);
         }
-        async function Upload(){
+        async function Upload() {
             const title = document.getElementById("title").value;
             const userId = localStorage.getItem("token");
             const image = document.getElementById("image").files[0];
             const file = document.getElementById("chunk").files[0];
 
-            if(image != null && file != null && userId != null && title != null)
-            {
+            if (image != null && file != null && userId != null && title != null) {
                 const fd = new FormData();
                 fd.append("title", title);
                 fd.append("userId", userId);
@@ -123,11 +184,11 @@
                     body: fd
                 });
                 const data = await res.text();
-                if(!res.ok || data == ""){
+                if (!res.ok || data == "") {
                     alert("error");
                     return;
                 }
-
+                msg.innerHTML = "File is being uploaded";
                 await sendChunk(data, file);
 
             } else {
@@ -138,4 +199,5 @@
         }
     </script>
 </body>
+
 </html>

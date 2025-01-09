@@ -41,13 +41,20 @@
             border-radius: 10px;
             color : white;
         }
+        .auth{
+            display: inline;
+        }
     </style>
 </head>
 <body>
 <form id="form">
     <h1>Login</h1>
-    <input type="text" name="email" id="email" placeholder="Enter Email" />
+    <input type="email" name="email" id="email" placeholder="Enter Email" />
     <input type="password" name="password" id="password" placeholder="Enter Password" />
+    <div>
+        <p class="auth">Have account? </p>
+        <a class="auth" href="/register.html" >Register</a>
+    </div>
     <button type="submit" id="button">Login</button>
 </form>
 
@@ -71,6 +78,7 @@
                 const data = await res.text();
                 console.log(data);
                 localStorage.setItem("token", data);
+                window.location.href = "/videos.html";
             }
             else if(res.NOT_FOUND){
                 alert("email not found");

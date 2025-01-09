@@ -41,14 +41,21 @@
             border-radius: 10px;
             color : white;
         }
+        .auth{
+            display: inline;
+        }
     </style>
 </head>
 <body>
         <form id="form">
             <h1>Registration</h1>
             <input type="text" name="fullName" id="name" placeholder="Enter Name"/>
-            <input type="text" name="email" id="email" placeholder="Enter Email" />
+            <input type="email" name="email" id="email" placeholder="Enter Email" />
             <input type="password" name="password" id="password" placeholder="Enter Password" />
+            <div>
+                <p class="auth" >Have account? </p>
+                <a class="auth" href="/login.html" >Login</a>
+            </div>
             <button type="submit" id="button">Register</button>
         </form>
 
@@ -74,7 +81,7 @@
                 }
                 const data = await res.text();
                 localStorage.setItem("token" , data );
-                alert(data);
+                window.location.href = "/videos.html";
             }
             catch(e){
                 console.log(e);
