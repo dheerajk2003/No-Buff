@@ -92,5 +92,11 @@ public class UploadController {
         model.addAttribute("id", id);
         return "watch";
     }
+
+    @GetMapping("/titlevids/{name}")
+    @ResponseBody
+    public Iterable<Upload> titVids(@PathVariable String name){
+        return us.findByTitle(name);
+    }
 }
 

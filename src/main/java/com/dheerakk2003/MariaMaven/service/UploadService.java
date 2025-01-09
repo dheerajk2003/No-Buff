@@ -35,6 +35,8 @@ public class UploadService {
         return ur.findAll();
     }
 
+    //uploadService
+
     public Optional<Upload> get(Long id){
         Optional<Upload> u = ur.findById(id);
         if(u.isEmpty())
@@ -127,5 +129,9 @@ public class UploadService {
 
     public void remove(String filename){
         ur.delete(ur.findByFilename(filename));
+    }
+
+    public Iterable<Upload> findByTitle(String name){
+        return ur.findByTitle(name);
     }
 }

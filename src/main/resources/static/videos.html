@@ -125,12 +125,40 @@
     .card:is(:hover, :focus-visible) {
       --hover: 1;
     }
+    #search{
+      width: 25%;
+      height: 100%;
+      display:flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: center;
+    }
+    #search input{
+      width: 70%;
+      height: 60%;
+      padding-left: 20px;
+      border: 2px solid black;
+      border-radius: 30px 0px 0px 30px;
+    }
+    #search button{
+      width: 30%;
+      height: 60%;
+      border: 2px solid black;
+      font-weight: bold;
+      border-radius: 0px 30px 30px 0px;
+      color: white;
+      background-color: black;
+    }
   </style>
 </head>
 
 <body>
   <nav>
     <h2>NoBuff</h2>
+    <div id="search">
+      <input type="text" id="searchInput" placeholder="Search" />
+      <button onclick="Search()">Search</button>
+    </div>
     <ul>
       <li><a href="/videos.html">HOME</a></li>
       <li><a href="/upload.html">UPLOAD</a></li>
@@ -147,6 +175,7 @@
         }
     function render(data) {
       const container = document.getElementById("container");
+        container.innerHTML = "";
       for (i = 0; i < data.length; i++) {
         console.log(data[i].id);
         const card = `<a href="/watch/${data[i].id}" class="card">
@@ -158,6 +187,19 @@
         </a>`;
         container.innerHTML += card;
       }
+    }
+    async function Search() {
+      console.log("clicked");
+      const container = document.getElementById("container");
+      const search = document.getElementById("searchInput").value;
+      const res = await fetch(`/titlevids/${search}`);
+      if(!res.ok){
+        container.innerHTML = "NOT FOUND";
+        return;
+      }
+      const data = await res.json();
+      console.log("res = " + res, "data = " + data);
+      render(data);
     }
     async function getVids() {
       const res = await fetch("/allvid", {
