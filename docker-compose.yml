@@ -1,0 +1,30 @@
+
+services:
+  springboot-app:
+    build:
+      context: .
+    ports:
+      - "8080:8080"
+    depends_on:
+      - springdb
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mariadb://springdb:3306/social_media
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: password
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+    networks:
+      - springnet
+
+  springdb:
+    image: mariadb
+    restart: always
+    environment:
+      MARIADB_ROOT_PASSWORD: password
+      MARIADB_DATABASE: social_media
+    ports:
+      - "3306:3306"
+    networks:
+      - springnet
+
+networks:
+  springnet:
