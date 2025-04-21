@@ -10,12 +10,14 @@ services:
     depends_on:
       - mariamaven-db
     environment:
-      SPRING_DATASOURCE_URL: jdbc:mariadb://mariamaven-db:3306/mariamaven
+      SPRING_DATASOURCE_URL: jdbc:mariadb://mariamaven-db:3306/mariamaven?createDatabaseIfNotExist=true&allowPublicKeyRetrieval=true&useSSL=false
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: root
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      SPRING_DATASOURCE_DRIVER-CLASS-NAME: org.mariadb.jdbc.Driver
     networks:
       - springnet
+    restart: on-failure
 
   mariamaven-db:
     container_name: mariamaven-db
@@ -33,6 +35,7 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+    command: --wait_timeout=28800 --interactive_timeout=28800
 
 networks:
   springnet:
