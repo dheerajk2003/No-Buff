@@ -1,11 +1,13 @@
 services:
   mariamaven-app:
+    container_name: mariamaven-app
     build:
       context: .
     ports:
       - "8080:8080"
     depends_on:
-      - mariamaven-db
+      mariamaven-db:
+        condition: service_healthy
     environment:
       SPRING_DATASOURCE_URL: jdbc:mariadb://mariamaven-db:3306/mariamaven
       SPRING_DATASOURCE_USERNAME: root
@@ -15,6 +17,7 @@ services:
       - springnet
 
   mariamaven-db:
+    container_name: mariamaven-db
     image: mariadb
     restart: always
     environment:
@@ -24,6 +27,13 @@ services:
       - "3306:3306"
     networks:
       - springnet
+    healthcheck:
+      test: ["CMD-SHELL", "mariadb -uroot -proot -e 'SELECT 1'"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
 
 networks:
   springnet:
+    driver: bridge
